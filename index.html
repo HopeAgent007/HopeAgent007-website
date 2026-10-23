@@ -12,6 +12,23 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Lora:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <link rel="preload" as="image" href="hero-bg.webp">
+
+    <!-- Link previews (WhatsApp, Facebook, etc.) -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="HopeAgent007 | Building Tools for the Lord's Work">
+    <meta property="og:description" content="Equipping Seventh-day Adventist churches and ministries with modern, open-source technology.">
+    <meta name="twitter:card" content="summary">
+
+    <!-- Apply saved or system theme before first paint to avoid a light flash -->
+    <script>
+        (function () {
+            var theme = null;
+            try { theme = localStorage.getItem('site_theme'); } catch (e) {}
+            if (!theme && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) theme = 'dark';
+            if (theme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+        })();
+    </script>
 </head>
 <body>
     <nav class="navbar fade-in">
@@ -148,15 +165,15 @@
                     <form action="https://formspree.io/f/xeennbgd" method="POST" class="contact-form">
                         <div class="form-group">
                             <label for="name" data-i18n="contact_label_name">Name</label>
-                            <input type="text" id="name" name="name" required placeholder="John Doe">
+                            <input type="text" id="name" name="name" required placeholder="John Doe" data-i18n-placeholder="placeholder_name">
                         </div>
                         <div class="form-group">
                             <label for="email" data-i18n="contact_label_email">Email</label>
-                            <input type="email" id="email" name="email" required placeholder="john@example.com">
+                            <input type="email" id="email" name="email" required placeholder="john@example.com" data-i18n-placeholder="placeholder_email">
                         </div>
                         <div class="form-group">
                             <label for="message" data-i18n="contact_label_message">Message</label>
-                            <textarea id="message" name="message" rows="5" required placeholder="How can we help?"></textarea>
+                            <textarea id="message" name="message" rows="5" required placeholder="How can we help?" data-i18n-placeholder="placeholder_message"></textarea>
                         </div>
                         <button type="submit" class="btn btn-primary btn-submit" data-i18n="contact_btn_send">Send Message</button>
                     </form>
@@ -174,7 +191,7 @@
                         <input type="hidden" name="subject" value="Newsletter Subscription">
                         <div class="form-group">
                             <label for="newsletter-email" data-i18n="contact_label_email">Email</label>
-                            <input type="email" id="newsletter-email" name="email" required placeholder="john@example.com">
+                            <input type="email" id="newsletter-email" name="email" required placeholder="john@example.com" data-i18n-placeholder="placeholder_email">
                         </div>
                         <button type="submit" class="btn btn-secondary btn-submit" data-i18n="newsletter_btn">Subscribe</button>
                     </form>

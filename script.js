@@ -32,7 +32,12 @@ const translations = {
         newsletter_desc: "Sign up for our newsletter to receive the latest updates on project releases and ministry tools.",
         newsletter_btn: "Subscribe",
         footer_link: "GitHub Organization",
-        footer_copy: "© 2026 HopeAgent007. Built for ministry."
+        footer_copy: "© 2026 HopeAgent007. Built for ministry.",
+        placeholder_name: "John Doe",
+        placeholder_email: "john@example.com",
+        placeholder_message: "How can we help?",
+        projects_error: "Failed to load projects. Please try again later.",
+        project_default_desc: "A Seventh-day Adventist ministry tool."
     },
     es: {
         page_title: "HopeAgent007 | Creando Herramientas para la Obra del Señor",
@@ -66,7 +71,12 @@ const translations = {
         newsletter_desc: "Suscríbete a nuestro boletín para recibir las últimas actualizaciones sobre lanzamientos de proyectos y herramientas ministeriales.",
         newsletter_btn: "Suscribirse",
         footer_link: "Organización de GitHub",
-        footer_copy: "© 2026 HopeAgent007. Creado para el ministerio."
+        footer_copy: "© 2026 HopeAgent007. Creado para el ministerio.",
+        placeholder_name: "Juan Pérez",
+        placeholder_email: "juan@ejemplo.com",
+        placeholder_message: "¿Cómo podemos ayudarte?",
+        projects_error: "No se pudieron cargar los proyectos. Inténtalo de nuevo más tarde.",
+        project_default_desc: "Una herramienta para el ministerio adventista del séptimo día."
     },
     ro: {
         page_title: "HopeAgent007 | Construim Unelte pentru Lucrarea Domnului",
@@ -100,7 +110,12 @@ const translations = {
         newsletter_desc: "Abonează-te la newsletter-ul nostru pentru a primi cele mai recente actualizări despre proiecte și unelte pentru misiune.",
         newsletter_btn: "Abonează-te",
         footer_link: "Organizația GitHub",
-        footer_copy: "© 2026 HopeAgent007. Construit pentru misiune."
+        footer_copy: "© 2026 HopeAgent007. Construit pentru misiune.",
+        placeholder_name: "Ion Popescu",
+        placeholder_email: "ion@exemplu.ro",
+        placeholder_message: "Cu ce vă putem ajuta?",
+        projects_error: "Proiectele nu au putut fi încărcate. Vă rugăm să încercați mai târziu.",
+        project_default_desc: "O unealtă pentru lucrarea adventistă de ziua a șaptea."
     }
 };
 
@@ -146,6 +161,18 @@ function updateTranslations() {
             }
         }
     });
+
+    // Update input placeholders
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        if (translations[currentLang] && translations[currentLang][key]) {
+            el.placeholder = translations[currentLang][key];
+        }
+    });
+}
+
+function t(key) {
+    return (translations[currentLang] && translations[currentLang][key]) || translations.en[key];
 }
 
 // --- Dark Mode Logic ---
@@ -154,9 +181,9 @@ function initTheme() {
     const sunIcon = document.querySelector('.sun-icon');
     const moonIcon = document.querySelector('.moon-icon');
     
-    const savedTheme = localStorage.getItem('site_theme') || 'light';
-    if (savedTheme === 'dark') {
-        document.documentElement.setAttribute('data-theme', 'dark');
+    // The theme itself is applied by the inline script in <head> to avoid a flash;
+    // here we only sync the icons with it.
+    if (document.documentElement.getAttribute('data-theme') === 'dark') {
         sunIcon.style.display = 'none';
         moonIcon.style.display = 'block';
     }
@@ -186,10 +213,16 @@ async function fetchProjects() {
     const loader = document.getElementById('projects-loader');
     
     try {
-        const response = await fetch('https://api.github.com/users/HopeAgent007/repos?sort=updated');
-        if (!response.ok) throw new Error('Failed to fetch repositories');
-        
-        const repos = await response.json();
+        // Cache for the browser session to stay well under GitHub's 60 req/hour anonymous limit
+        let repos = null;
+        try { repos = JSON.parse(sessionStorage.getItem('gh_repos')); } catch (e) {}
+
+        if (!Array.isArray(repos)) {
+            const response = await fetch('https://api.github.com/users/HopeAgent007/repos?sort=updated');
+            if (!response.ok) throw new Error('Failed to fetch repositories');
+            repos = await response.json();
+            try { sessionStorage.setItem('gh_repos', JSON.stringify(repos)); } catch (e) {}
+        }
         
         // Remove loader
         if (loader) loader.remove();
@@ -216,13 +249,24 @@ async function fetchProjects() {
                 <div class="project-icon">
                     <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
                 </div>
-                <h3 class="project-title">${formattedName}</h3>
-                <p class="project-desc">${repo.description || 'A Seventh-day Adventist ministry tool.'}</p>
-                <a href="${repo.html_url}" target="_blank" rel="noopener noreferrer" class="project-link">
-                    <span data-i18n="project_view_github">${translations[currentLang]['project_view_github'] || 'View on GitHub'}</span>
+                <h3 class="project-title"></h3>
+                <p class="project-desc"></p>
+                <a target="_blank" rel="noopener noreferrer" class="project-link">
+                    <span data-i18n="project_view_github"></span>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                 </a>
             `;
+            // Fill API data as plain text so repo metadata can never inject HTML
+            card.querySelector('.project-title').textContent = formattedName;
+            const desc = card.querySelector('.project-desc');
+            if (repo.description) {
+                desc.textContent = repo.description;
+            } else {
+                desc.setAttribute('data-i18n', 'project_default_desc');
+                desc.textContent = t('project_default_desc');
+            }
+            card.querySelector('.project-link').href = repo.html_url;
+            card.querySelector('[data-i18n="project_view_github"]').textContent = t('project_view_github');
             container.appendChild(card);
         });
 
@@ -234,7 +278,8 @@ async function fetchProjects() {
         if (loader) {
             loader.style.animation = 'none';
             loader.style.borderColor = 'transparent';
-            loader.innerHTML = '<p style="color:var(--clr-text-light);">Failed to load projects. Please try again later.</p>';
+            loader.innerHTML = '<p style="color:var(--clr-text-light);"><span data-i18n="projects_error"></span> <a href="https://github.com/HopeAgent007" target="_blank" rel="noopener noreferrer" data-i18n="footer_link"></a></p>';
+            updateTranslations();
         }
     }
 }
