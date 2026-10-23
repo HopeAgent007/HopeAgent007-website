@@ -181,7 +181,7 @@ a {
     min-height: 100vh;
     display: flex;
     align-items: center;
-    background-image: url('hero-bg.png');
+    background-image: url('hero-bg.webp');
     background-size: cover;
     background-position: center;
     padding-top: 5rem;
