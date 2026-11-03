@@ -37,7 +37,11 @@ const translations = {
         placeholder_email: "john@example.com",
         placeholder_message: "How can we help?",
         projects_error: "Failed to load projects. Please try again later.",
-        project_default_desc: "A Seventh-day Adventist ministry tool."
+        project_default_desc: "A Seventh-day Adventist ministry tool.",
+        form_sending: "Sending…",
+        form_success: "Thank you! Your message has been sent.",
+        newsletter_success: "Thank you for subscribing!",
+        form_error: "Something went wrong. Please try again."
     },
     es: {
         page_title: "HopeAgent007 | Creando Herramientas para la Obra del Señor",
@@ -76,7 +80,11 @@ const translations = {
         placeholder_email: "juan@ejemplo.com",
         placeholder_message: "¿Cómo podemos ayudarte?",
         projects_error: "No se pudieron cargar los proyectos. Inténtalo de nuevo más tarde.",
-        project_default_desc: "Una herramienta para el ministerio adventista del séptimo día."
+        project_default_desc: "Una herramienta para el ministerio adventista del séptimo día.",
+        form_sending: "Enviando…",
+        form_success: "¡Gracias! Tu mensaje ha sido enviado.",
+        newsletter_success: "¡Gracias por suscribirte!",
+        form_error: "Algo salió mal. Por favor, inténtalo de nuevo."
     },
     ro: {
         page_title: "HopeAgent007 | Construim Unelte pentru Lucrarea Domnului",
@@ -115,19 +123,91 @@ const translations = {
         placeholder_email: "ion@exemplu.ro",
         placeholder_message: "Cu ce vă putem ajuta?",
         projects_error: "Proiectele nu au putut fi încărcate. Vă rugăm să încercați mai târziu.",
-        project_default_desc: "O unealtă pentru lucrarea adventistă de ziua a șaptea."
+        project_default_desc: "O unealtă pentru lucrarea adventistă de ziua a șaptea.",
+        form_sending: "Se trimite…",
+        form_success: "Mulțumim! Mesajul a fost trimis.",
+        newsletter_success: "Mulțumim pentru abonare!",
+        form_error: "Ceva nu a funcționat. Vă rugăm să încercați din nou."
     }
 };
 
-let currentLang = localStorage.getItem('site_lang') || 'en';
+let currentLang = detectLanguage();
+
+// Saved choice first, then the browser's preferred languages, then English
+function detectLanguage() {
+    let saved = null;
+    try { saved = localStorage.getItem('site_lang'); } catch (e) {}
+    if (saved && translations[saved]) return saved;
+
+    const preferred = navigator.languages || [navigator.language || 'en'];
+    for (const tag of preferred) {
+        const base = String(tag).toLowerCase().split('-')[0];
+        if (translations[base]) return base;
+    }
+    return 'en';
+}
 
 // --- Initialization ---
 document.addEventListener('DOMContentLoaded', () => {
     initTheme();
     initLanguage();
     initScrollAnimations();
+    initMobileMenu();
+    initForms();
     fetchProjects();
 });
+
+// --- Mobile Menu ---
+function initMobileMenu() {
+    const toggle = document.getElementById('menu-toggle');
+    const links = document.getElementById('nav-links');
+    if (!toggle || !links) return;
+
+    const setOpen = (open) => {
+        links.classList.toggle('is-open', open);
+        toggle.setAttribute('aria-expanded', String(open));
+        toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    };
+
+    toggle.addEventListener('click', () => setOpen(!links.classList.contains('is-open')));
+    // Close after picking a section or pressing Escape
+    links.addEventListener('click', (e) => { if (e.target.closest('a')) setOpen(false); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setOpen(false); });
+}
+
+// --- Forms (submit to Formspree without leaving the page) ---
+function initForms() {
+    document.querySelectorAll('.contact-form').forEach(form => {
+        const status = form.querySelector('.form-status');
+        const button = form.querySelector('button[type="submit"]');
+        const isNewsletter = !!form.querySelector('input[name="subject"]');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            button.disabled = true;
+            status.className = 'form-status';
+            status.textContent = t('form_sending');
+
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    body: new FormData(form),
+                    headers: { 'Accept': 'application/json' }
+                });
+                if (!response.ok) throw new Error('Form submission failed');
+                form.reset();
+                status.classList.add('is-success');
+                status.textContent = t(isNewsletter ? 'newsletter_success' : 'form_success');
+            } catch (error) {
+                console.error('Error submitting form:', error);
+                status.classList.add('is-error');
+                status.textContent = t('form_error');
+            } finally {
+                button.disabled = false;
+            }
+        });
+    });
+}
 
 // --- Language Toggle Logic ---
 function initLanguage() {
@@ -148,6 +228,9 @@ function initLanguage() {
 }
 
 function updateTranslations() {
+    // Lets screen readers and search engines know which language is shown
+    document.documentElement.lang = currentLang;
+
     const elements = document.querySelectorAll('[data-i18n]');
     elements.forEach(el => {
         const key = el.getAttribute('data-i18n');

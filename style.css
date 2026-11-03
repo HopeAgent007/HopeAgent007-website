@@ -1,3 +1,38 @@
+/* --- Self-hosted Fonts (variable, OFL-1.1; see fonts/LICENSE-*.txt) --- */
+/* latin-ext covers Romanian ă â î ș ț and Spanish accents beyond Latin-1 */
+@font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-display: swap;
+    font-weight: 100 900;
+    src: url('fonts/inter-latin-ext-wght-normal.woff2') format('woff2-variations');
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-display: swap;
+    font-weight: 100 900;
+    src: url('fonts/inter-latin-wght-normal.woff2') format('woff2-variations');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+    font-family: 'Lora';
+    font-style: normal;
+    font-display: swap;
+    font-weight: 400 700;
+    src: url('fonts/lora-latin-ext-wght-normal.woff2') format('woff2-variations');
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+    font-family: 'Lora';
+    font-style: normal;
+    font-display: swap;
+    font-weight: 400 700;
+    src: url('fonts/lora-latin-wght-normal.woff2') format('woff2-variations');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
 :root {
     /* Color Palette - Light Mode (Default) */
     --clr-bg: #fdfaf6; /* Cream */
@@ -88,6 +123,7 @@ a {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 1rem;
 }
 
 .logo {
@@ -562,9 +598,63 @@ section {
 }
 
 /* --- Responsive --- */
+.menu-toggle {
+    display: none;
+}
+
+.form-status {
+    margin-top: 1rem;
+    font-size: 0.95rem;
+    color: var(--clr-text-light);
+}
+
+.form-status:empty {
+    display: none;
+}
+
+.form-status.is-success {
+    color: var(--clr-blue);
+}
+
+[data-theme="dark"] .form-status.is-success {
+    color: var(--clr-gold);
+}
+
+.form-status.is-error {
+    color: #b91c1c;
+}
+
+[data-theme="dark"] .form-status.is-error {
+    color: #fca5a5;
+}
+
 @media (max-width: 768px) {
+    .menu-toggle {
+        display: flex;
+    }
+
+    /* Mobile menu: drops down under the fixed navbar when opened */
     .nav-links {
         display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        flex-direction: column;
+        gap: 0;
+        padding: 0.5rem 1.5rem 1rem;
+        background-color: var(--clr-bg);
+        border-bottom: 1px solid var(--clr-border);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+    }
+
+    .nav-links.is-open {
+        display: flex;
+    }
+
+    .nav-links a {
+        display: block;
+        padding: 0.75rem 0;
     }
     
     .hero-cta {
