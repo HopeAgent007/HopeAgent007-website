@@ -617,7 +617,7 @@ section {
 }
 
 [data-theme="dark"] .form-status.is-success {
-    color: var(--clr-gold-light);
+    color: var(--clr-gold);
 }
 
 .form-status.is-error {

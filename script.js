@@ -131,7 +131,21 @@ const translations = {
     }
 };
 
-let currentLang = localStorage.getItem('site_lang') || 'en';
+let currentLang = detectLanguage();
+
+// Saved choice first, then the browser's preferred languages, then English
+function detectLanguage() {
+    let saved = null;
+    try { saved = localStorage.getItem('site_lang'); } catch (e) {}
+    if (saved && translations[saved]) return saved;
+
+    const preferred = navigator.languages || [navigator.language || 'en'];
+    for (const tag of preferred) {
+        const base = String(tag).toLowerCase().split('-')[0];
+        if (translations[base]) return base;
+    }
+    return 'en';
+}
 
 // --- Initialization ---
 document.addEventListener('DOMContentLoaded', () => {
@@ -214,6 +228,9 @@ function initLanguage() {
 }
 
 function updateTranslations() {
+    // Lets screen readers and search engines know which language is shown
+    document.documentElement.lang = currentLang;
+
     const elements = document.querySelectorAll('[data-i18n]');
     elements.forEach(el => {
         const key = el.getAttribute('data-i18n');

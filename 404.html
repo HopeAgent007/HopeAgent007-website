@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
+    <title>Page Not Found | HopeAgent007</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%231e3a8a%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22M12 5v14M5 10h14%22/></svg>">
+    <!-- Self-contained on purpose: GitHub Pages serves this file at any missing path,
+         so relative links to style.css or fonts/ would break on nested URLs. -->
+    <style>
+        :root {
+            --clr-bg: #fdfaf6;
+            --clr-text: #2d2020;
+            --clr-text-light: #5a4b4b;
+            --clr-blue: #1e3a8a;
+            --clr-gold: #d9a05b;
+        }
+        [data-theme="dark"] {
+            --clr-bg: #1a1515;
+            --clr-text: #f0eaea;
+            --clr-text-light: #b3a6a6;
+            --clr-blue: #3b82f6;
+            --clr-gold: #e6b87a;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            background-color: var(--clr-bg);
+            color: var(--clr-text);
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            text-align: center;
+            line-height: 1.6;
+        }
+        .wrap { max-width: 32rem; }
+        .icon { color: var(--clr-gold); margin-bottom: 1rem; }
+        .code {
+            font-family: 'Lora', Georgia, serif;
+            font-size: 4.5rem;
+            font-weight: 600;
+            color: var(--clr-blue);
+            line-height: 1;
+        }
+        h1 {
+            font-family: 'Lora', Georgia, serif;
+            font-weight: 500;
+            font-size: 1.75rem;
+            margin: 1rem 0 0.5rem;
+        }
+        p { color: var(--clr-text-light); margin-bottom: 2rem; }
+        a.btn {
+            display: inline-block;
+            padding: 0.75rem 1.75rem;
+            border-radius: 6px;
+            background-color: var(--clr-blue);
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        a.btn:hover { opacity: 0.9; }
+        a.btn:focus-visible { outline: 3px solid var(--clr-gold); outline-offset: 3px; }
+    </style>
+    <script>
+        (function () {
+            var theme = null;
+            try { theme = localStorage.getItem('site_theme'); } catch (e) {}
+            if (!theme && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) theme = 'dark';
+            if (theme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+        })();
+    </script>
+</head>
+<body>
+    <main class="wrap">
+        <svg class="icon" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 10h14"/></svg>
+        <div class="code">404</div>
+        <h1 id="title">Page not found</h1>
+        <p id="text">The page you are looking for doesn't exist or has been moved.</p>
+        <a id="home" class="btn" href="/">Back to home</a>
+    </main>
+
+    <script>
+        (function () {
+            var strings = {
+                en: { title: 'Page not found', text: "The page you are looking for doesn't exist or has been moved.", home: 'Back to home', doc: 'Page Not Found | HopeAgent007' },
+                es: { title: 'Página no encontrada', text: 'La página que buscas no existe o ha sido movida.', home: 'Volver al inicio', doc: 'Página no encontrada | HopeAgent007' },
+                ro: { title: 'Pagina nu a fost găsită', text: 'Pagina pe care o căutați nu există sau a fost mutată.', home: 'Înapoi la pagina principală', doc: 'Pagina nu a fost găsită | HopeAgent007' }
+            };
+
+            var lang = null;
+            try { lang = localStorage.getItem('site_lang'); } catch (e) {}
+            if (!strings[lang]) {
+                lang = 'en';
+                var preferred = navigator.languages || [navigator.language || 'en'];
+                for (var i = 0; i < preferred.length; i++) {
+                    var base = String(preferred[i]).toLowerCase().split('-')[0];
+                    if (strings[base]) { lang = base; break; }
+                }
+            }
+
+            var s = strings[lang];
+            document.documentElement.lang = lang;
+            document.title = s.doc;
+            document.getElementById('title').textContent = s.title;
+            document.getElementById('text').textContent = s.text;
+            document.getElementById('home').textContent = s.home;
+
+            // On a github.io project site the home page lives under /<repo>/, not /
+            if (location.hostname.slice(-10) === '.github.io') {
+                var first = location.pathname.split('/')[1];
+                if (first) document.getElementById('home').href = '/' + first + '/';
+            }
+        })();
+    </script>
+</body>
+</html>
