@@ -602,6 +602,13 @@ section {
     display: none;
 }
 
+.featured-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem 1.5rem;
+}
+
 .form-status {
     margin-top: 1rem;
     font-size: 0.95rem;
